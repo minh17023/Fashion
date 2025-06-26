@@ -6,7 +6,8 @@ from fastapi.responses import RedirectResponse
 from backend.schemas.user import UserCreate, UserOut, Token
 from backend.models.user import User
 from backend.utils.auth import get_password_hash, verify_password, create_access_token
-from backend.dependencies.auth import get_db, get_current_user
+from backend.database import get_db
+from backend.dependencies.auth import get_current_user
 from ..utils.email import send_login_notification
 import os
 
