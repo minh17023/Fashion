@@ -8,6 +8,8 @@ from backend.database import engine, Base
 from backend.routers import auth
 from backend.routers import product
 from backend.routers import categorie
+from backend.routers import cart
+from backend.routers import order
 
 app = FastAPI()
 
@@ -29,4 +31,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(product.router)
 app.include_router(categorie.router)
+app.include_router(cart.router)
+app.include_router(order.router)
 
