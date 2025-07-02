@@ -78,7 +78,7 @@ function Header() {
           </li>
           <li className="nav-item"><Link className="nav-link" to="/category/1">Áo</Link></li>
           <li className="nav-item"><Link className="nav-link" to="/category/2">Quần</Link></li>
-          <li className="nav-item"><Link className="nav-link" to="/category/3">Phụ kiện</Link></li>
+          <li className="nav-item"><Link className="nav-link" to="/category/6">Phụ kiện</Link></li>
         </ul>
 
         {/* Thanh tìm kiếm */}

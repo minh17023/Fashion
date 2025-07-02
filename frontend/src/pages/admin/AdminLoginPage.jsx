@@ -41,7 +41,6 @@ const AdminLoginPage = () => {
         <div className="card-body">
           <h2 className="text-center mb-4">Đăng nhập</h2>
           <form onSubmit={handleLogin}>
-            {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="mb-3">
               <label htmlFor="username" className="form-label">Tên đăng nhập</label>
@@ -68,7 +67,7 @@ const AdminLoginPage = () => {
                 required
               />
             </div>
-
+            {error && <div className="alert alert-danger">{error}</div>}
             <button type="submit" className="btn btn-primary w-100">Đăng nhập</button>
           </form>
         </div>

@@ -34,7 +34,8 @@ def update_categorie(categorie_id: int, categorie: schemas.categorie.CategorieCr
     if not db_categorie:
         raise HTTPException(status_code=404, detail="Categorie not found")
     
-    for key, value in categorie.dict().items():
+    update_data = categorie.dict(exclude_unset=True)  # cập nhật từng trường có giá trị
+    for key, value in update_data.items():
         setattr(db_categorie, key, value)
 
     db.commit()
@@ -44,7 +45,6 @@ def update_categorie(categorie_id: int, categorie: schemas.categorie.CategorieCr
 # Xóa danh mục nếu không bị ràng buộc với sản phẩm
 @router.delete("/{categorie_id}")
 def delete_categorie(categorie_id: int, db: Session = Depends(get_db)):
-    # Kiểm tra danh mục có đang được dùng không
     used = db.query(models.product.Product).filter_by(categorie_id=categorie_id).first()
     if used:
         raise HTTPException(status_code=400, detail="Danh mục này đang được sử dụng bởi sản phẩm, không thể xóa.")

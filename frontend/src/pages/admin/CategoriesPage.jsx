@@ -13,7 +13,9 @@ const CategoriesPage = () => {
   const [page, setPage] = useState(1);
   const [show, setShow] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: "" });
+  const [form, setForm] = useState({ name: "", img: "" });
+  const [imgFile, setImgFile] = useState(null);
+  const [previewImg, setPreviewImg] = useState(null);
   const perPage = 5;
 
   const fetchAll = async () => {
@@ -26,7 +28,9 @@ const CategoriesPage = () => {
   }, []);
 
   const resetState = () => {
-    setForm({ name: "" });
+    setForm({ name: "", img: "" });
+    setImgFile(null);
+    setPreviewImg(null);
     setEditing(null);
   };
 
@@ -36,24 +40,39 @@ const CategoriesPage = () => {
       return;
     }
 
-    try {
-      if (editing) {
-        await updateCategorie(editing.id, form);
-      } else {
-        await addCategorie(form);
+    const saveData = async (imgBase64 = null) => {
+      const payload = { ...form };
+      if (imgBase64) payload.img = imgBase64;
+
+      try {
+        if (editing) {
+          await updateCategorie(editing.id, payload);
+        } else {
+          await addCategorie(payload);
+        }
+        setShow(false);
+        resetState();
+        fetchAll();
+      } catch (err) {
+        console.error(err);
+        alert("Không thể lưu danh mục");
       }
-      setShow(false);
-      resetState();
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      alert("Không thể lưu danh mục");
+    };
+
+    if (imgFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result.split(",")[1];
+        saveData(base64);
+      };
+      reader.readAsDataURL(imgFile);
+    } else {
+      saveData();
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
-
     try {
       await deleteCategorie(id);
       fetchAll();
@@ -91,8 +110,9 @@ const CategoriesPage = () => {
       <Table bordered hover>
         <thead className="table-light">
           <tr>
-            <th>#</th>
+            <th>STT</th>
             <th>Tên danh mục</th>
+            <th>Ảnh</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -102,13 +122,17 @@ const CategoriesPage = () => {
               <td>{(page - 1) * perPage + i + 1}</td>
               <td>{c.name}</td>
               <td>
+                <img src={c.img} alt={c.name} style={{ width: 50, height: 50 }} />
+              </td>
+              <td>
                 <Button
                   size="sm"
                   variant="warning"
                   className="me-2"
                   onClick={() => {
                     setEditing(c);
-                    setForm({ name: c.name });
+                    setForm({ name: c.name, img: c.img });
+                    setPreviewImg(`data:image/*;base64,${c.img}`);
                     setShow(true);
                   }}
                 >
@@ -150,6 +174,32 @@ const CategoriesPage = () => {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Ảnh danh mục</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                setImgFile(file);
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => setPreviewImg(reader.result);
+                  reader.readAsDataURL(file);
+                } else {
+                  setPreviewImg(null);
+                }
+              }}
+            />
+            {previewImg && (
+              <img
+                src={previewImg}
+                alt="preview"
+                style={{ width: 100, height: 100, marginTop: 10, objectFit: "cover" }}
+              />
+            )}
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>

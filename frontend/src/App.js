@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 // 🛒 Trang khách hàng
@@ -27,14 +27,26 @@ import CategoriesPage from './pages/admin/CategoriesPage';
 
 function App() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin") && !location.pathname.startsWith("/admin/login");
+  const isAdminLogin = location.pathname === "/admin/login";
+  const isAdmin = location.pathname.startsWith("/admin") && !isAdminLogin;
+
+  // 🔁 Đổi tiêu đề tab theo route
+  useEffect(() => {
+    if (isAdminLogin) {
+      document.title = "Đăng nhập quản trị";
+    } else if (isAdmin) {
+      document.title = "Trang quản trị";
+    } else {
+      document.title = "Fashion Shop";
+    }
+  }, [isAdminLogin, isAdmin]);
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {/* Chỉ hiện Header/Footer nếu không phải trang admin */}
-      {!isAdminRoute && <Header />}
+      {/* Ẩn header/footer nếu là trang admin hoặc admin login */}
+      {!isAdmin && !isAdminLogin && <Header />}
 
-      <main className="flex-grow-1" style={{ marginTop: !isAdminRoute ? "55px" : "0" }}>
+      <main className="flex-grow-1" style={{ marginTop: !isAdmin && !isAdminLogin ? "55px" : "0" }}>
         <Routes>
           {/* 👤 Trang người dùng */}
           <Route path="/" element={<TrangChu />} />
@@ -51,8 +63,12 @@ function App() {
           {/* 🛠 Admin Login */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* 🛠 Admin Layout + Bảo vệ */}
-          <Route path="/admin" element={<RequireAdminAuth><AdminLayout /></RequireAdminAuth>}>
+          {/* 🛠 Admin Layout (Yêu cầu xác thực) */}
+          <Route path="/admin" element={
+            <RequireAdminAuth>
+              <AdminLayout />
+            </RequireAdminAuth>
+          }>
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="orders" element={<OrdersPage />} />
@@ -62,7 +78,7 @@ function App() {
         </Routes>
       </main>
 
-      {!isAdminRoute && <Footer />}
+      {!isAdmin && !isAdminLogin && <Footer />}
     </div>
   );
 }

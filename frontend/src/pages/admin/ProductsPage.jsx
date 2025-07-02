@@ -105,7 +105,7 @@ const ProductsPage = () => {
       <Table bordered hover>
         <thead className="table-light">
           <tr>
-            <th>#</th>
+            <th>Id</th>
             <th>Tên</th>
             <th>Giá</th>
             <th>SL</th>

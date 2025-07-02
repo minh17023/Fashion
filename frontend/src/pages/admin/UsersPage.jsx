@@ -69,7 +69,7 @@ const UsersPage = () => {
       <Table bordered hover>
         <thead className="table-light">
           <tr>
-            <th>#</th>
+            <th>Id</th>
             <th>Tên đăng nhập</th>
             <th>Email</th>
             <th>Phân quyền</th>
