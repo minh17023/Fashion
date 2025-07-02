@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class UserBase(BaseModel):
@@ -14,8 +14,13 @@ class UserLogin(BaseModel):
 
 class UserOut(UserBase):
     id: int
-    role: str
+    role: Optional[str]
+    is_active: Optional[bool] = True
 
+class UserUpdate(BaseModel):
+    role: Optional[str] = Field(default=None)
+    is_active: Optional[bool] = Field(default=None)
+    
     class Config:
         from_attributes = True
 

@@ -59,7 +59,13 @@ function Header() {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 fixed-top">
-      <Link className="navbar-brand" to="/">🛍️ Shop Fashion</Link>
+      <Link className="navbar-brand" to="/">
+      <img
+        src="/logow.png"
+        alt="Logo"
+        style={{ height: "40px", marginRight: "8px" }}
+      />
+        Fashion</Link>
 
       <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span className="navbar-toggler-icon"></span>

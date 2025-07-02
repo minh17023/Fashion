@@ -26,6 +26,6 @@ export const getCurrentUser = async () => {
 
 // Dữ liệu dành riêng cho admin
 export const getAdminData = async () => {
-  const res = await axiosClient.get("/auth/admin-only");
+  const res = await axiosClient.get("/auth/admin");
   return res.data;
 };

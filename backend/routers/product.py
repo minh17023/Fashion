@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend import models, schemas
 from sqlalchemy import func
+
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
@@ -30,12 +31,21 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.product.Product)
-def create_product(product: schemas.product.ProductCreate, db: Session = Depends(get_db)):
-    db_product = models.product.Product(**product.dict())
-    db.add(db_product)
+def create_product(
+    data: schemas.product.ProductBase = Body(...),
+    db: Session = Depends(get_db)
+):
+    new_product = models.product.Product(
+        name=data.name,
+        price=data.price,
+        quantity=data.quantity,
+        categorie_id=data.categorie_id,
+        img=data.img  # base64 string
+    )
+    db.add(new_product)
     db.commit()
-    db.refresh(db_product)
-    return db_product
+    db.refresh(new_product)
+    return new_product
 
 
 @router.put("/{product_id}", response_model=schemas.product.Product)

@@ -21,18 +21,24 @@ function LoginPage() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    try {
-      const res = await loginUser(form.username, form.password);
-      localStorage.setItem("access_token", res.access_token);
-      alert("Đăng nhập thành công!");
-      navigate("/"); // về trang chủ
-    } catch (err) {
-      setError(err?.response?.data?.detail || "Lỗi đăng nhập");
-    }
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setError("");
+      try {
+        const res = await loginUser(form.username, form.password);
+        localStorage.setItem("access_token", res.access_token);
+        alert("Đăng nhập thành công!");
+        navigate("/");
+      } catch (err) {
+        if (err?.response?.status === 403) {
+          setError("Tài khoản của bạn đã bị vô hiệu hóa.");
+        } else if (err?.response?.status === 401) {
+          setError("Sai tên đăng nhập hoặc mật khẩu.");
+        } else {
+          setError("Lỗi đăng nhập. Vui lòng thử lại.");
+        }
+      }
+    };    
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8000/auth/google-login";
@@ -64,7 +70,6 @@ function LoginPage() {
           />
         </div>
         {error && <div className="alert alert-danger">{error}</div>}
-
         <button type="submit" className="btn btn-primary w-100">
           Đăng nhập
         </button>

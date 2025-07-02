@@ -1,5 +1,7 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+
+// 🛒 Trang khách hàng
 import TrangChu from "./pages/TrangChu";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -13,13 +15,28 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 
+// 🛠 Trang admin
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import RequireAdminAuth from './components/admin/RequireAdminAuth';
+import AdminLayout from './components/admin/AdminLayout'; 
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import ProductsPage from './pages/admin/ProductsPage';
+import OrdersPage from './pages/admin/OrdersPage';
+import UsersPage from './pages/admin/UsersPage';
+import CategoriesPage from './pages/admin/CategoriesPage';
 
 function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin") && !location.pathname.startsWith("/admin/login");
+
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <main className="flex-grow-1" style={{ marginTop: "55px" }}>
+      {/* Chỉ hiện Header/Footer nếu không phải trang admin */}
+      {!isAdminRoute && <Header />}
+
+      <main className="flex-grow-1" style={{ marginTop: !isAdminRoute ? "55px" : "0" }}>
         <Routes>
+          {/* 👤 Trang người dùng */}
           <Route path="/" element={<TrangChu />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -30,9 +47,22 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
+
+          {/* 🛠 Admin Login */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+
+          {/* 🛠 Admin Layout + Bảo vệ */}
+          <Route path="/admin" element={<RequireAdminAuth><AdminLayout /></RequireAdminAuth>}>
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="orders" element={<OrdersPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+          </Route>
         </Routes>
       </main>
-      <Footer />
+
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }

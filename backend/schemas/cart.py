@@ -16,7 +16,7 @@ class CartItemOut(CartItemBase):
     product: ProductOut  # Liên kết đến sản phẩm (để lấy tên, giá, ảnh,...)
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Giỏ hàng đầy đủ trả về cho frontend
 class CartOut(BaseModel):
@@ -25,4 +25,4 @@ class CartOut(BaseModel):
     items: List[CartItemOut]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

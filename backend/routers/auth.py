@@ -54,6 +54,9 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 
     #  Gửi email thông báo
     # await send_login_notification(email, name)
+        
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
 
     access_token = create_access_token(data={"sub": user.username})
     return RedirectResponse(url=f"http://localhost:3000/login?token={access_token}")
@@ -90,6 +93,9 @@ async def facebook_callback(request: Request, db: Session = Depends(get_db)):
         db.add(user)
         db.commit()
         db.refresh(user)
+    
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
 
     access_token = create_access_token(data={"sub": user.username})
     return RedirectResponse(url=f"http://localhost:3000/login?token={access_token}")
@@ -128,8 +134,11 @@ async def login(
 
     # Gửi email thông báo (nếu bạn bật)
     # await send_login_notification(user.email, user.username)
+    
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
 
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": user.username, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
 
 # ------------------ Lấy thông tin cá nhân ------------------
@@ -140,8 +149,9 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 # ------------------ API chỉ cho Admin ------------------
 
-@router.get("/admin-only")
+@router.get("/admin")
 def get_admin_data(current_user: User = Depends(get_current_user)):
+    print("ROLE FROM DB:", current_user.role)
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Không đủ quyền truy cập")
     return {"message": "Bạn là admin, truy cập thành công!"}
