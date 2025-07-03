@@ -14,7 +14,7 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
-
+import MyOrdersPage from "./pages/MyOrdersPage";
 
 // 🛠 Trang admin
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -25,6 +25,9 @@ import ProductsPage from './pages/admin/ProductsPage';
 import OrdersPage from './pages/admin/OrdersPage';
 import UsersPage from './pages/admin/UsersPage';
 import CategoriesPage from './pages/admin/CategoriesPage';
+
+// ✅ Context để đồng bộ đơn hàng
+import { OrderProvider } from "./contexts/OrderContext";
 
 function App() {
   const location = useLocation();
@@ -43,44 +46,47 @@ function App() {
   }, [isAdminLogin, isAdmin]);
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      {/* Ẩn header/footer nếu là trang admin hoặc admin login */}
-      {!isAdmin && !isAdminLogin && <Header />}
+    <OrderProvider>
+      <div className="d-flex flex-column min-vh-100">
+        {/* Ẩn header/footer nếu là trang admin hoặc admin login */}
+        {!isAdmin && !isAdminLogin && <Header />}
 
-      <main className="flex-grow-1" style={{ marginTop: !isAdmin && !isAdminLogin ? "55px" : "0" }}>
-        <Routes>
-          {/* 👤 Trang người dùng */}
-          <Route path="/" element={<TrangChu />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/category/:id" element={<CategoryPage />} />
-          <Route path="/me" element={<ThongTinTaiKhoan />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/thank-you" element={<ThankYouPage />} />
+        <main className="flex-grow-1" style={{ marginTop: !isAdmin && !isAdminLogin ? "55px" : "0" }}>
+          <Routes>
+            {/* 👤 Trang người dùng */}
+            <Route path="/" element={<TrangChu />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/category/:id" element={<CategoryPage />} />
+            <Route path="/me" element={<ThongTinTaiKhoan />} /> 
+            <Route path="/my-orders" element={<MyOrdersPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/thank-you" element={<ThankYouPage />} />
 
-          {/* 🛠 Admin Login */}
-          <Route path="/admin/login" element={<AdminLoginPage />} />
+            {/* 🛠 Admin Login */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* 🛠 Admin Layout (Yêu cầu xác thực) */}
-          <Route path="/admin" element={
-            <RequireAdminAuth>
-              <AdminLayout />
-            </RequireAdminAuth>
-          }>
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="products" element={<ProductsPage />} />
-            <Route path="orders" element={<OrdersPage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="categories" element={<CategoriesPage />} />
-          </Route>
-        </Routes>
-      </main>
+            {/* 🛠 Admin Layout (Yêu cầu xác thực) */}
+            <Route path="/admin" element={
+              <RequireAdminAuth>
+                <AdminLayout />
+              </RequireAdminAuth>
+            }>
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="categories" element={<CategoriesPage />} />
+            </Route>
+          </Routes>
+        </main>
 
-      {!isAdmin && !isAdminLogin && <Footer />}
-    </div>
+        {!isAdmin && !isAdminLogin && <Footer />}
+      </div>
+    </OrderProvider>
   );
 }
 

@@ -149,6 +149,24 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 # ------------------ API chỉ cho Admin ------------------
 
+@router.post("/admin-login", response_model=Token)
+async def admin_login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Sai thông tin đăng nhập")
+    
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
+
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Tài khoản không có quyền admin")
+
+    access_token = create_access_token(data={"sub": user.username, "role": user.role})
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @router.get("/admin")
 def get_admin_data(current_user: User = Depends(get_current_user)):
     print("ROLE FROM DB:", current_user.role)

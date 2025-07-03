@@ -5,12 +5,12 @@ import AdminSidebar from './AdminSidebar';
 
 const AdminLayout = () => {
   return (
-    <div className="min-h-screen d-flex flex-column">
+    <div className="d-flex flex-column" style={{ minHeight: '100vh' }}>
       <AdminHeader />
       <div className="d-flex flex-grow-1">
         <AdminSidebar />
-        <main className="flex-grow-1 p-4 bg-white">
-          <Outlet />  
+        <main className="flex-grow-1 w-100 p-4 bg-white">
+          <Outlet />
         </main>
       </div>
     </div>

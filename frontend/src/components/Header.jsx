@@ -118,8 +118,15 @@ function Header() {
                 {user.username}
               </button>
               <ul className="dropdown-menu dropdown-menu-end">
-                <li><Link className="dropdown-item" to="/me">Thông tin tài khoản</Link></li>
-                <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
+                <li>
+                  <Link className="dropdown-item" to="/me">Thông tin tài khoản</Link>
+                </li>
+                <li>
+                  <Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link>
+                </li>
+                <li>
+                  <button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button>
+                </li>
               </ul>
             </li>
           ) : (

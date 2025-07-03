@@ -5,11 +5,16 @@ import enum
 from datetime import datetime
 
 class OrderStatus(str, enum.Enum):
-    pending = "pending"
-    paid = "paid"
-    shipped = "shipped"
-    completed = "completed"
-    canceled = "canceled"
+    pending = "pending"                   # Mặc định khi mới đặt
+    paid = "paid"                         # Admin xác nhận đơn
+    shipped = "shipped"                   # Đơn đang được giao
+    completed = "completed"              # Người dùng xác nhận nhận hàng
+
+    cancel_requested = "cancel_requested"  # Người dùng yêu cầu hủy
+    canceled = "canceled"                  # Admin xác nhận hủy
+
+    return_requested = "return_requested"  # Người dùng yêu cầu hoàn hàng
+    returned = "returned"                  # Admin xác nhận hoàn hàng
 
 class Order(Base):
     __tablename__ = "orders"

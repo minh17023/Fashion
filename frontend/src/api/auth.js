@@ -24,8 +24,20 @@ export const getCurrentUser = async () => {
   return res.data;
 };
 
+export const loginAdmin = async (username, password) => {
+  const formData = new URLSearchParams();
+  formData.append("username", username);
+  formData.append("password", password);
+
+  const res = await axiosClient.post("/auth/admin-login", formData, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  });
+  return res.data;
+};
+
 // Dữ liệu dành riêng cho admin
 export const getAdminData = async () => {
   const res = await axiosClient.get("/auth/admin");
   return res.data;
 };
+
