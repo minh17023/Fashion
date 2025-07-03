@@ -1,4 +1,3 @@
-// src/pages/SearchPage.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
@@ -33,8 +32,16 @@ function SearchPage() {
                 <div className="card h-100 border-0 shadow-sm">
                   <div style={{ width: "100%", paddingTop: "100%", position: "relative" }}>
                     <img
-                      src={p.img}
+                      src={
+                        p.img?.startsWith("http")
+                          ? p.img
+                          : `http://localhost:8000${p.img}`
+                      }
                       alt={p.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/default.png";
+                      }}
                       className="card-img-top"
                       style={{
                         position: "absolute",
@@ -48,7 +55,10 @@ function SearchPage() {
                     />
                   </div>
                   <div className="card-body p-2">
-                    <p className="card-title mb-1" style={{ fontSize: "14px", fontWeight: "500" }}>
+                    <p
+                      className="card-title mb-1"
+                      style={{ fontSize: "14px", fontWeight: "500" }}
+                    >
                       {p.name.length > 50 ? p.name.slice(0, 50) + "..." : p.name}
                     </p>
                     <div className="text-danger fw-bold" style={{ fontSize: "15px" }}>

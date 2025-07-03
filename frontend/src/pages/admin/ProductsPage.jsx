@@ -1,4 +1,3 @@
-// src/pages/admin/ProductsPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   getAllProducts,
@@ -23,6 +22,7 @@ const ProductsPage = () => {
     categorie_id: "",
   });
   const [imgFile, setImgFile] = useState(null);
+  const [previewImg, setPreviewImg] = useState(null);
   const perPage = 5;
 
   const fetchAll = async () => {
@@ -37,38 +37,31 @@ const ProductsPage = () => {
   const resetState = () => {
     setForm({ name: "", price: "", quantity: "", categorie_id: "" });
     setImgFile(null);
+    setPreviewImg(null);
     setEditing(null);
   };
 
-  const readFileAsBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-  
   const handleSave = async () => {
-    try {
-      let imgBase64 = editing?.img || "";
-      if (imgFile) {
-        imgBase64 = await readFileAsBase64(imgFile); // 👍 đảm bảo ảnh đã sẵn sàng
-      }
-  
-      const payload = { ...form, img: imgBase64 };
-      await submitData(payload);
-    } catch (err) {
-      console.error("Không thể xử lý ảnh:", err);
-      alert("Lỗi xử lý ảnh");
+    if (!form.name || !form.price || !form.quantity || !form.categorie_id) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+      return;
     }
-  };
 
-  const submitData = async (payload) => {
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    formData.append("quantity", form.quantity);
+    formData.append("categorie_id", form.categorie_id);
+    if (imgFile) {
+      formData.append("img", imgFile);
+    }
+
     try {
-      editing
-        ? await updateProduct(editing.id, payload)
-        : await addProduct(payload);
+      if (editing) {
+        await updateProduct(editing.id, formData);
+      } else {
+        await addProduct(formData);
+      }
       setShow(false);
       resetState();
       fetchAll();
@@ -85,6 +78,8 @@ const ProductsPage = () => {
 
   return (
     <div>
+      <h4 className="mb-3">📦 Quản lý sản phẩm</h4>
+
       <div className="d-flex justify-content-between mb-3">
         <input
           className="form-control w-50"
@@ -98,14 +93,14 @@ const ProductsPage = () => {
             setShow(true);
           }}
         >
-          + Thêm
+          ➕ Thêm
         </Button>
       </div>
 
       <Table bordered hover>
         <thead className="table-light">
           <tr>
-            <th>Id</th>
+            <th>STT</th>
             <th>Tên</th>
             <th>Giá</th>
             <th>SL</th>
@@ -123,7 +118,13 @@ const ProductsPage = () => {
               <td>{p.quantity}</td>
               <td>{categories.find((c) => c.id === p.categorie_id)?.name || p.categorie_id}</td>
               <td>
-              <img src={p.img} alt={p.name} style={{ width: 50, height: 50 }} />
+                {p.img && (
+                  <img
+                    src={`http://localhost:8000${p.img}`}
+                    alt={p.name}
+                    style={{ width: 50, height: 50, objectFit: "cover" }}
+                  />
+                )}
               </td>
               <td>
                 <Button
@@ -138,6 +139,7 @@ const ProductsPage = () => {
                       quantity: p.quantity,
                       categorie_id: p.categorie_id,
                     });
+                    setPreviewImg(`http://localhost:8000${p.img}`);
                     setShow(true);
                   }}
                 >
@@ -182,9 +184,7 @@ const ProductsPage = () => {
                 <Form.Control
                   type={field === "name" ? "text" : "number"}
                   value={form[field]}
-                  onChange={(e) =>
-                    setForm({ ...form, [field]: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, [field]: e.target.value })}
                 />
               </Form.Group>
             ))}
@@ -192,9 +192,7 @@ const ProductsPage = () => {
               <Form.Label>Danh mục</Form.Label>
               <Form.Select
                 value={form.categorie_id}
-                onChange={(e) =>
-                  setForm({ ...form, categorie_id: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, categorie_id: e.target.value })}
               >
                 <option value="">-- Chọn danh mục --</option>
                 {categories.map((c) => (
@@ -209,8 +207,25 @@ const ProductsPage = () => {
               <Form.Control
                 type="file"
                 accept="image/*"
-                onChange={(e) => setImgFile(e.target.files[0])}
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  setImgFile(file);
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setPreviewImg(reader.result);
+                    reader.readAsDataURL(file);
+                  } else {
+                    setPreviewImg(null);
+                  }
+                }}
               />
+              {previewImg && (
+                <img
+                  src={previewImg}
+                  alt="Preview"
+                  style={{ width: 100, height: 100, objectFit: "cover", marginTop: 10 }}
+                />
+              )}
             </Form.Group>
           </Form>
         </Modal.Body>

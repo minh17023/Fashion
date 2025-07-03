@@ -5,7 +5,13 @@ import {
   updateCategorie,
   deleteCategorie,
 } from "../../api/categories";
-import { Modal, Button, Form, Table, Pagination } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Table,
+  Pagination
+} from "react-bootstrap";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -35,39 +41,31 @@ const CategoriesPage = () => {
   };
 
   const handleSave = async () => {
-    if (form.name.trim() === "") {
+    if (!form.name.trim()) {
       alert("Tên danh mục không được để trống");
       return;
     }
 
-    const saveData = async (imgBase64 = null) => {
-      const payload = { ...form };
-      if (imgBase64) payload.img = imgBase64;
-
-      try {
-        if (editing) {
-          await updateCategorie(editing.id, payload);
-        } else {
-          await addCategorie(payload);
-        }
-        setShow(false);
-        resetState();
-        fetchAll();
-      } catch (err) {
-        console.error(err);
-        alert("Không thể lưu danh mục");
-      }
-    };
-
+    const formData = new FormData();
+    formData.append("name", form.name);
     if (imgFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result.split(",")[1];
-        saveData(base64);
-      };
-      reader.readAsDataURL(imgFile);
-    } else {
-      saveData();
+      formData.append("img", imgFile);
+    }
+
+    try {
+      if (editing) {
+        await updateCategorie(editing.id, formData);
+        alert("Cập nhật danh mục thành công");
+      } else {
+        await addCategorie(formData);
+        alert("Thêm danh mục thành công");
+      }
+      setShow(false);
+      resetState();
+      fetchAll();
+    } catch (err) {
+      console.error(err);
+      alert("Không thể lưu danh mục");
     }
   };
 
@@ -75,6 +73,7 @@ const CategoriesPage = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
     try {
       await deleteCategorie(id);
+      alert("Xóa danh mục thành công");
       fetchAll();
     } catch (err) {
       alert(err.response?.data?.detail || "Lỗi khi xóa danh mục");
@@ -122,7 +121,13 @@ const CategoriesPage = () => {
               <td>{(page - 1) * perPage + i + 1}</td>
               <td>{c.name}</td>
               <td>
-                <img src={c.img} alt={c.name} style={{ width: 50, height: 50 }} />
+                {c.img && (
+                  <img
+                    src={`http://localhost:8000${c.img}`}
+                    alt={c.name}
+                    style={{ width: 50, height: 50, objectFit: "cover" }}
+                  />
+                )}
               </td>
               <td>
                 <Button
@@ -132,7 +137,7 @@ const CategoriesPage = () => {
                   onClick={() => {
                     setEditing(c);
                     setForm({ name: c.name, img: c.img });
-                    setPreviewImg(`data:image/*;base64,${c.img}`);
+                    setPreviewImg(`http://localhost:8000${c.img}`);
                     setShow(true);
                   }}
                 >
@@ -197,7 +202,12 @@ const CategoriesPage = () => {
               <img
                 src={previewImg}
                 alt="preview"
-                style={{ width: 100, height: 100, marginTop: 10, objectFit: "cover" }}
+                style={{
+                  width: 100,
+                  height: 100,
+                  marginTop: 10,
+                  objectFit: "cover",
+                }}
               />
             )}
           </Form.Group>

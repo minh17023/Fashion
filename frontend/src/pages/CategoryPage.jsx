@@ -25,14 +25,19 @@ function CategoryPage() {
       <div className="row">
         {products.map((item) => (
           <div className="col-6 col-sm-4 col-md-3 mb-4" key={item.id}>
-            <Link
-              to={`/product/${item.id}`}
-              className="text-decoration-none text-dark"
-            >
+            <Link to={`/product/${item.id}`} className="text-decoration-none text-dark">
               <div className="card h-100 border-0 shadow-sm">
                 <div style={{ width: "100%", paddingTop: "100%", position: "relative" }}>
                   <img
-                    src={item.img}
+                    src={
+                      item.img?.startsWith("http")
+                        ? item.img
+                        : `http://localhost:8000${item.img}`
+                    }
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default.png";
+                    }}
                     alt={item.name}
                     className="card-img-top"
                     style={{

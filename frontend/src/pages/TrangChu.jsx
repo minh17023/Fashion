@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllProducts } from "../api/product";
 import { getCategories } from "../api/categories";
+import Banner from "../components/Banner";
 import { Link } from "react-router-dom";
 
 function TrangChu() {
@@ -25,54 +26,59 @@ function TrangChu() {
     fetchData();
   }, []);
 
-  const latestProducts = [...products]
-    .sort((a, b) => b.id - a.id) // giả sử sản phẩm mới có id lớn hơn
-    .slice(0, 8);
-
+  const latestProducts = [...products].sort((a, b) => b.id - a.id).slice(0, 8);
   const filteredProducts = selectedCategoryId
     ? products.filter((p) => p.categorie_id === selectedCategoryId)
     : [];
 
+  const renderProductCard = (p) => (
+    <div className="col-6 col-sm-4 col-md-3 mb-4" key={p.id}>
+      <Link to={`/product/${p.id}`} className="text-decoration-none text-dark">
+        <div className="card h-100 border-0 shadow-sm">
+          <div style={{ width: "100%", paddingTop: "100%", position: "relative" }}>
+            <img
+              src={p.img.startsWith("http") ? p.img : `http://localhost:8000${p.img}`}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/default.png";
+              }}
+              className="card-img-top"
+              alt={p.name}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "0.5rem",
+              }}
+            />
+          </div>
+          <div className="card-body p-2">
+            <p className="card-title mb-1" style={{ fontSize: "14px", fontWeight: "500" }}>
+              {p.name.length > 50 ? p.name.slice(0, 50) + "..." : p.name}
+            </p>
+            <div className="text-danger fw-bold" style={{ fontSize: "15px" }}>
+              ₫{p.price.toLocaleString()}
+            </div>
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              ★★★★★ (1234)
+            </div>
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+
   return (
     <div className="container mt-4">
+      <Banner />
+
       {/* 🆕 SẢN PHẨM MỚI NHẤT */}
       <h4 className="mb-4 fw-bold text-center">🆕 Sản phẩm mới nhất</h4>
       <div className="row mb-5">
-        {latestProducts.map((p) => (
-          <div className="col-6 col-sm-4 col-md-3 mb-4" key={p.id}>
-            <Link to={`/product/${p.id}`} className="text-decoration-none text-dark">
-              <div className="card h-100 border-0 shadow-sm">
-                <div style={{ width: "100%", paddingTop: "100%", position: "relative" }}>
-                  <img
-                    src={p.img}
-                    className="card-img-top"
-                    alt={p.name}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                </div>
-                <div className="card-body p-2">
-                  <p className="card-title mb-1" style={{ fontSize: "14px", fontWeight: "500" }}>
-                    {p.name.length > 50 ? p.name.slice(0, 50) + "..." : p.name}
-                  </p>
-                  <div className="text-danger fw-bold" style={{ fontSize: "15px" }}>
-                    ₫{p.price.toLocaleString()}
-                  </div>
-                  <div className="text-muted" style={{ fontSize: "13px" }}>
-                    ★★★★★ (1234)
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
-        ))}
+        {latestProducts.map(renderProductCard)}
       </div>
 
       {/* 🗂 DANH MỤC */}
@@ -114,14 +120,15 @@ function TrangChu() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                border:
-                  selectedCategoryId === c.id
-                    ? "2px solid #007bff"
-                    : "1px solid transparent",
+                border: selectedCategoryId === c.id ? "2px solid #007bff" : "1px solid transparent",
               }}
             >
               <img
-                src={c.img}
+                src={`http://localhost:8000${c.img}`}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default.png";
+                }}
                 alt={c.name}
                 style={{
                   width: "100%",
@@ -145,46 +152,7 @@ function TrangChu() {
           </h4>
           <div className="row">
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((p) => (
-                <div className="col-6 col-sm-4 col-md-3 mb-4" key={p.id}>
-                  <Link to={`/product/${p.id}`} className="text-decoration-none text-dark">
-                    <div className="card h-100 border-0 shadow-sm">
-                      <div
-                        style={{ width: "100%", paddingTop: "100%", position: "relative" }}
-                      >
-                        <img
-                          src={p.img}
-                          className="card-img-top"
-                          alt={p.name}
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "0.5rem",
-                          }}
-                        />
-                      </div>
-                      <div className="card-body p-2">
-                        <p
-                          className="card-title mb-1"
-                          style={{ fontSize: "14px", fontWeight: "500" }}
-                        >
-                          {p.name.length > 50 ? p.name.slice(0, 50) + "..." : p.name}
-                        </p>
-                        <div className="text-danger fw-bold" style={{ fontSize: "15px" }}>
-                          ₫{p.price.toLocaleString()}
-                        </div>
-                        <div className="text-muted" style={{ fontSize: "13px" }}>
-                          ★★★★★ (1234)
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              ))
+              filteredProducts.map(renderProductCard)
             ) : (
               <div className="text-center text-muted">Không có sản phẩm nào</div>
             )}

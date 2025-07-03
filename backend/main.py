@@ -12,7 +12,11 @@ from backend.routers import cart
 from backend.routers import order
 from backend.routers import user
 
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Tạo các bảng trong cơ sở dữ liệu nếu chưa có
 Base.metadata.create_all(bind=engine)

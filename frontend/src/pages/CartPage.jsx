@@ -15,7 +15,6 @@ function CartPage() {
     try {
       setLoading(true);
       const res = await getMyCart();
-      console.log("Cart API response:", res.data);
       setCart(res.data);
     } catch (err) {
       console.error("Lỗi khi lấy giỏ hàng:", err);
@@ -48,7 +47,8 @@ function CartPage() {
     0
   );
 
-  if (loading) return <div className="text-center mt-5">Đang tải giỏ hàng...</div>;
+  if (loading)
+    return <div className="text-center mt-5">Đang tải giỏ hàng...</div>;
 
   return (
     <div className="container mt-4">
@@ -70,14 +70,33 @@ function CartPage() {
               {cart.items.map((item) => (
                 <tr key={item.id}>
                   <td style={{ width: "100px" }}>
-                    <img
-                      src={item.product?.img}
-                      alt={item.product?.name}
-                      className="img-fluid rounded"
-                    />
+                    <div style={{ width: "100px", aspectRatio: "1", position: "relative" }}>
+                      <img
+                        src={
+                          item.product?.img?.startsWith("http")
+                            ? item.product.img
+                            : `http://localhost:8000${item.product?.img}`
+                        }
+                        alt={item.product?.name}
+                        className="img-fluid rounded"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/default.png";
+                        }}
+                        style={{
+                          objectFit: "cover",
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "8px",
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                        }}
+                      />
+                    </div>
                   </td>
                   <td>{item.product?.name}</td>
-                  <td>{item.product?.price.toLocaleString()} VNĐ</td>
+                  <td>{item.product?.price?.toLocaleString()} VNĐ</td>
                   <td>
                     <input
                       type="number"
@@ -90,7 +109,9 @@ function CartPage() {
                       style={{ width: "70px" }}
                     />
                   </td>
-                  <td>{(item.product?.price * item.quantity).toLocaleString()} VNĐ</td>
+                  <td>
+                    {(item.product?.price * item.quantity).toLocaleString()} VNĐ
+                  </td>
                   <td>
                     <button
                       className="btn btn-sm btn-danger"
@@ -105,7 +126,12 @@ function CartPage() {
           </table>
 
           <div className="text-end">
-            <h5>Tổng cộng: <span className="text-danger">{total.toLocaleString()} VNĐ</span></h5>
+            <h5>
+              Tổng cộng:{" "}
+              <span className="text-danger">
+                {total?.toLocaleString()} VNĐ
+              </span>
+            </h5>
             <button
               className="btn btn-success mt-2"
               onClick={() => navigate("/checkout")}
@@ -115,7 +141,9 @@ function CartPage() {
           </div>
         </>
       ) : (
-        <p>Giỏ hàng của bạn đang trống. <Link to="/">Mua sắm ngay</Link>.</p>
+        <p>
+          Giỏ hàng của bạn đang trống. <Link to="/">Mua sắm ngay</Link>.
+        </p>
       )}
     </div>
   );
