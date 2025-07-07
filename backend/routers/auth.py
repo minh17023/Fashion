@@ -53,7 +53,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         db.refresh(user)
 
     #  Gửi email thông báo
-    # await send_login_notification(email, name)
+    await send_login_notification(email, name)
         
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
@@ -133,7 +133,7 @@ async def login(
         raise HTTPException(status_code=401, detail="Sai thông tin đăng nhập")
 
     # Gửi email thông báo (nếu bạn bật)
-    # await send_login_notification(user.email, user.username)
+    await send_login_notification(user.email, user.username)
     
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Tài khoản đã bị vô hiệu hóa")
